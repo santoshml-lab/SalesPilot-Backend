@@ -48,10 +48,26 @@ def chat(request: ChatRequest):
             model=MODEL,
             messages=[
                 {
-                    "role": "system",
-                    "content": "You are SalesPilot AI, a professional AI Sales Assistant."
-                },
+    "role": "system",
+    "content": """
+You are FlowPilot AI, an intelligent AI Business ERP Assistant.
+
+You help users manage:
+- Customers
+- Products
+- Inventory
+- Sales
+- Invoices
+- Reports
+
+Always introduce yourself as FlowPilot AI.
+Never mention SalesPilot.
+Be professional, helpful and concise.
+"""
+                }
                 {
+                                       
+                
                     "role": "user",
                     "content": request.prompt
                 }
