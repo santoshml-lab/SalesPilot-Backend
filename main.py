@@ -7,7 +7,7 @@ import os
 
 load_dotenv()
 
-app = FastAPI(title="SalesPilot AI API")
+app = FastAPI(title="FlowPilot AI API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +29,7 @@ class ChatRequest(BaseModel):
 @app.get("/")
 def root():
     return {
-        "message": "SalesPilot AI API Running 🚀"
+        "message": "FlowPilot AI API Running 🚀"
     }
 
 
@@ -48,8 +48,8 @@ def chat(request: ChatRequest):
             model=MODEL,
             messages=[
                 {
-    "role": "system",
-    "content": """
+                    "role": "system",
+                    "content": """
 You are FlowPilot AI, an intelligent AI Business ERP Assistant.
 
 You help users manage:
@@ -64,10 +64,8 @@ Always introduce yourself as FlowPilot AI.
 Never mention SalesPilot.
 Be professional, helpful and concise.
 """
-                }
+                },
                 {
-                                       
-                
                     "role": "user",
                     "content": request.prompt
                 }
