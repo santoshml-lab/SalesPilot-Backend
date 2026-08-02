@@ -1,7 +1,5 @@
 fastapi
-uvicorn[standard]
+uvicorn
 groq
 python-dotenv
-pydantic
-httpx
-python-multipart
+supabase
