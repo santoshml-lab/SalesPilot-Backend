@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
 from dotenv import load_dotenv
+from supabase import create_client
 import os
 
 load_dotenv()
@@ -18,6 +19,11 @@ app.add_middleware(
 )
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+supabase = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_KEY")
+)
 
 MODEL = "openai/gpt-oss-20b"
 
@@ -40,9 +46,49 @@ def health():
     }
 
 
+def get_low_stock_products():
+    response = (
+        supabase
+        .from("products")
+        .select("*")
+        .execute()
+    )
+
+    products = response.data or []
+
+    low_stock = [
+        p for p in products
+        if int(p["stock"]) <= int(p["low_stock_limit"])
+    ]
+
+    return low_stock
+
+
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
+
+        prompt = request.prompt.lower()
+
+        if "low stock" in prompt:
+            low_stock = get_low_stock_products()
+
+            if not low_stock:
+                return {
+                    "response": "✅ No low stock products found."
+                }
+
+            text = "🔴 Low Stock Products:\n\n"
+
+            for item in low_stock:
+                text += (
+                    f"• {item['name']} "
+                    f"(Stock: {item['stock']})\n"
+                )
+
+            return {
+                "response": text
+            }
 
         response = client.chat.completions.create(
             model=MODEL,
