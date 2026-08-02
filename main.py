@@ -77,14 +77,9 @@ def chat(request: ChatRequest):
 
         prompt = request.prompt.lower()
 
+        # Low Stock Tool
         if "low stock" in prompt:
             low_stock = get_low_stock_products()
-        if "today revenue" in prompt or "revenue" in prompt:
-           revenue = get_today_revenue()
-
-    return {
-        "response": f"💰 Total Revenue: ₹{revenue}"
-    }
 
             if not low_stock:
                 return {
@@ -94,15 +89,21 @@ def chat(request: ChatRequest):
             text = "🔴 Low Stock Products:\n\n"
 
             for item in low_stock:
-                text += (
-                    f"• {item['name']} "
-                    f"(Stock: {item['stock']})\n"
-                )
+                text += f"• {item['name']} (Stock: {item['stock']})\n"
 
             return {
                 "response": text
             }
 
+        # Revenue Tool
+        if "today revenue" in prompt or "revenue" in prompt:
+            revenue = get_today_revenue()
+
+            return {
+                "response": f"💰 Total Revenue: ₹{revenue}"
+            }
+
+        # Normal AI Chat
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
@@ -139,3 +140,9 @@ Be professional, helpful and concise.
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+    
+
+        
+
+        
