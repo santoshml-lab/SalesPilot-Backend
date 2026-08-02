@@ -61,6 +61,14 @@ def get_low_stock_products():
     ]
 
     return low_stock
+def get_today_revenue():
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    revenue = sum(float(item["total"]) for item in sales)
+
+    return revenue
 
 
 @app.post("/chat")
@@ -71,6 +79,12 @@ def chat(request: ChatRequest):
 
         if "low stock" in prompt:
             low_stock = get_low_stock_products()
+        if "today revenue" in prompt or "revenue" in prompt:
+           revenue = get_today_revenue()
+
+    return {
+        "response": f"💰 Total Revenue: ₹{revenue}"
+    }
 
             if not low_stock:
                 return {
