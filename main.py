@@ -47,12 +47,11 @@ def health():
 
 
 def get_low_stock_products():
-    response = (
-        supabase
-        .from("products")
-        .select("*")
-        .execute()
-    )
+    response = supabase.table("products").select("*").execute()
+        
+          
+        
+    
 
     products = response.data or []
 
