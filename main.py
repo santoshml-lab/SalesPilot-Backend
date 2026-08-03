@@ -300,6 +300,44 @@ def get_purchase_history(customer_name):
     text += f"💰 Total Spent : ₹{total_spent}"
 
     return text
+
+def get_top_selling_products():
+
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    if not sales:
+        return "📭 No Sales Found"
+
+    product_sales = {}
+
+    for sale in sales:
+
+        product_name = get_product_name(sale["product_id"])
+
+        qty = int(sale["quantity"])
+
+        if product_name in product_sales:
+            product_sales[product_name] += qty
+        else:
+            product_sales[product_name] = qty
+
+    sorted_products = sorted(
+        product_sales.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    text = "🏆 Top Selling Products\n\n"
+
+    rank = 1
+
+    for product, qty in sorted_products[:5]:
+        text += f"{rank}. {product}\nSold : {qty}\n\n"
+        rank += 1
+
+    return text
     
     
         
@@ -387,6 +425,19 @@ def chat(request: ChatRequest):
 
             customer = extract_customer(prompt)
             result = get_purchase_history(customer)
+
+            return {
+                "response": result
+            }
+
+                # Top Selling Products Tool
+        if (
+            "top selling" in prompt
+            or "best selling" in prompt
+            or "most sold" in prompt
+        ):
+
+            result = get_top_selling_products()
 
             return {
                 "response": result
