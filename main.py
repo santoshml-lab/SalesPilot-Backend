@@ -133,6 +133,17 @@ def extract_quantity(prompt):
         return int(match.group())
 
     return 1
+
+def extract_product(prompt):
+    response = supabase.table("products").select("*").execute()
+
+    products = response.data or []
+
+    for product in products:
+        if product["name"].lower() in prompt.lower():
+            return product["name"]
+
+    return None
     
 
 
@@ -197,14 +208,25 @@ def chat(request: ChatRequest):
 
 
 
-                # Sell Product Command
         if "sell" in prompt:
 
-            qty = extract_quantity(prompt)
+    qty = extract_quantity(prompt)
+    product = extract_product(prompt)
 
-            return {
-                "response": f"🛒 Quantity Detected: {qty}"
-            }
+    return {
+        "response": f"🛒 Quantity: {qty}\n📦 Product: {product}"
+    }
+
+
+
+                
+        
+
+            
+
+            
+                
+            
             
 
 
