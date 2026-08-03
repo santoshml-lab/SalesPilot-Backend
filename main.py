@@ -608,6 +608,12 @@ def get_top_product():
         "revenue": product_sales[top_id]["revenue"]
     }
 
+
+
+    
+        
+        
+
 @app.get("/invoice/{invoice_no}")
 def download_invoice(invoice_no: str):
 
