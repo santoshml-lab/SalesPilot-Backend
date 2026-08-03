@@ -530,6 +530,22 @@ def get_recent_sales():
 
     return result
 
+@app.get("/low-stock")
+def low_stock():
+
+    products = get_low_stock_products()
+
+    result = []
+
+    for item in products:
+
+        result.append({
+            "name": item["name"],
+            "stock": item["stock"]
+        })
+
+    return result
+
 @app.get("/recent-sales")
 def recent_sales():
     return get_recent_sales()
