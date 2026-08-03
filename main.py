@@ -130,27 +130,27 @@ def chat(request: ChatRequest):
                 "response": f"💰 Total Revenue: ₹{revenue}"
             }
             # Revenue Tool
-if "today revenue" in prompt or "revenue" in prompt:
-    revenue = get_today_revenue()
+       if "today revenue" in prompt or "revenue" in prompt:
+          revenue = get_today_revenue()
 
-    return {
-        "response": f"💰 Total Revenue: ₹{revenue}"
+           return {
+               "response": f"💰 Total Revenue: ₹{revenue}"
     }
 
 # Customers Tool
-if "customers" in prompt or "total customers" in prompt:
-    total_customers = get_total_customers()
+      if "customers" in prompt or "total customers" in prompt:
+         total_customers = get_total_customers()
 
-    return {
-        "response": f"👥 Total Customers: {total_customers}"
+         return {
+             "response": f"👥 Total Customers: {total_customers}"
     }
 
 # Inventory Summary Tool
-if "inventory" in prompt or "inventory summary" in prompt:
+     if "inventory" in prompt or "inventory summary" in prompt:
     total_products, total_stock, low_stock = get_inventory_summary()
 
-    return {
-        "response": f"""📦 Inventory Summary
+         return {
+             "response": f"""📦 Inventory Summary
 
 📦 Total Products : {total_products}
 
