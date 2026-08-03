@@ -207,15 +207,22 @@ def chat(request: ChatRequest):
             }
 
 
-
         if "sell" in prompt:
 
-    qty = extract_quantity(prompt)
-    product = extract_product(prompt)
+          qty = extract_quantity(prompt)
+          product = extract_product(prompt)
 
-    return {
-        "response": f"🛒 Quantity: {qty}\n📦 Product: {product}"
+         return {
+            "response": f"🛒 Quantity: {qty}\n📦 Product: {product}"
     }
+
+
+
+        
+
+    
+    
+    
 
 
 
