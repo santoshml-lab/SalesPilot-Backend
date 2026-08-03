@@ -146,6 +146,19 @@ def extract_product(prompt):
             return product["name"]
 
     return "No Product Found"
+
+def extract_customer(prompt):
+    response = supabase.table("customers").select("*").execute()
+
+    customers = response.data or []
+
+    prompt = prompt.lower()
+
+    for customer in customers:
+        if customer["name"].lower() in prompt:
+            return customer["name"]
+
+    return "No Customer Found"
     
 
     
@@ -211,21 +224,30 @@ def chat(request: ChatRequest):
 """
             }
 
-                # Sell Product Command
-        if "sell" in prompt:
 
-            qty = extract_quantity(prompt)
-            product = extract_product(prompt)
+        # Sell Product Command
+       if "sell" in prompt:
 
-            return {
-                "response": f"""
-🛒 SELL TOOL WORKING
+         qty = extract_quantity(prompt)
+         product = extract_product(prompt)
+         customer = extract_customer(prompt)
 
-Quantity : {qty}
+           return {
+              "response": f"""
+🛒 SELL TOOL
 
-Product : {product}
+👤 Customer : {customer}
+
+📦 Product : {product}
+
+🔢 Quantity : {qty}
 """
-            }
+    }
+
+                
+        
+
+        
 
 
 
