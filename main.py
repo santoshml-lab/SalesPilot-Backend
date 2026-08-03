@@ -98,6 +98,34 @@ def get_inventory_summary():
 
     return total_products, total_stock, low_stock
 
+def find_product(product_name):
+    response = supabase.table("products").select("*").execute()
+
+    products = response.data or []
+
+    product_name = product_name.lower()
+
+    for product in products:
+        if product_name in product["name"].lower():
+            return product
+
+    return None
+
+def find_customer(customer_name):
+    response = supabase.table("customers").select("*").execute()
+
+    customers = response.data or []
+
+    customer_name = customer_name.lower()
+
+    for customer in customers:
+        if customer_name in customer["name"].lower():
+            return customer
+
+    return None
+
+
+
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
@@ -155,6 +183,17 @@ def chat(request: ChatRequest):
 🔴 Low Stock Products : {low_stock}
 """
             }
+            # Sell Product Command
+     if "sell" in prompt:
+        return {
+           "response": "🛒 Sale command detected. AI is ready to create the sale."
+    }
+
+        
+
+    
+        
+    
 
         # Normal AI Chat
         response = client.chat.completions.create(
