@@ -212,14 +212,44 @@ def chat(request: ChatRequest):
             }
 
 
-                # Sell Product Command
-        if "sell" in prompt:
 
-            qty = extract_quantity(prompt)
 
-            return {
-                "response": f"🛒 Quantity Detected: {qty}"
-            }
+        # Sell Product Command
+if "sell" in prompt:
+
+    qty = extract_quantity(prompt)
+    product = extract_product(prompt)
+
+    return {
+        "response": f"""
+SELL TOOL WORKING ✅
+
+Prompt: {prompt}
+
+Quantity: {qty}
+
+Product: {product}
+"""
+    }
+
+
+    
+
+
+        
+
+
+
+                
+        
+
+        
+
+            
+
+            
+                
+            
 
 
 
