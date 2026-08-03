@@ -530,6 +530,41 @@ def get_recent_sales():
 
     return result
 
+def get_best_customer():
+
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    customer_total = {}
+
+    for sale in sales:
+
+        cid = sale["customer_id"]
+
+        customer_total[cid] = customer_total.get(cid, 0) + float(sale["total"])
+
+    if not customer_total:
+        return None
+
+    best_customer_id = max(customer_total, key=customer_total.get)
+
+    customer = (
+        supabase.table("customers")
+        .select("*")
+        .eq("id", best_customer_id)
+        .execute()
+    )
+
+    return {
+        "name": customer.data[0]["name"],
+        "total": customer_total[best_customer_id]
+    }
+
+@app.get("/best-customer")
+def best_customer():
+    return get_best_customer()
+
 @app.get("/low-stock")
 def low_stock():
 
@@ -545,6 +580,8 @@ def low_stock():
         })
 
     return result
+
+
 
 @app.get("/recent-sales")
 def recent_sales():
