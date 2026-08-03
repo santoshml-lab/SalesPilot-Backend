@@ -338,6 +338,35 @@ def get_top_selling_products():
         rank += 1
 
     return text
+
+def get_monthly_sales():
+
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    if not sales:
+        return "📭 No Sales Found"
+
+    monthly_sales = {}
+
+    for sale in sales:
+
+        created_at = sale["created_at"][:7]   # YYYY-MM
+
+        total = float(sale["total"])
+
+        if created_at in monthly_sales:
+            monthly_sales[created_at] += total
+        else:
+            monthly_sales[created_at] = total
+
+    text = "📊 Monthly Sales Report\n\n"
+
+    for month, revenue in sorted(monthly_sales.items()):
+        text += f"📅 {month} : ₹{revenue}\n"
+
+    return text
     
     
         
@@ -438,6 +467,19 @@ def chat(request: ChatRequest):
         ):
 
             result = get_top_selling_products()
+
+            return {
+                "response": result
+            }
+
+                # Monthly Sales Analytics Tool
+        if (
+            "monthly sales" in prompt
+            or "sales report" in prompt
+            or "monthly report" in prompt
+        ):
+
+            result = get_monthly_sales()
 
             return {
                 "response": result
