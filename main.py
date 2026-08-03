@@ -412,6 +412,40 @@ def get_best_customer():
 
 💰 Total Spending : ₹{total_spent}
 """
+
+def get_business_summary():
+
+    revenue = get_today_revenue()
+
+    total_customers = get_total_customers()
+
+    total_products, total_stock, low_stock = get_inventory_summary()
+
+    top_products = get_top_selling_products()
+
+    best_customer = get_best_customer()
+
+    return f"""
+📊 FlowPilot AI Business Summary
+
+💰 Revenue : ₹{revenue}
+
+👥 Customers : {total_customers}
+
+📦 Products : {total_products}
+
+📊 Stock Units : {total_stock}
+
+🔴 Low Stock Items : {low_stock}
+
+----------------------------------
+
+{best_customer}
+
+----------------------------------
+
+{top_products}
+"""
     
     
         
@@ -538,6 +572,20 @@ def chat(request: ChatRequest):
         ):
 
             result = get_best_customer()
+
+            return {
+                "response": result
+            }
+
+                # Business Summary Tool
+        if (
+            "business summary" in prompt
+            or "business report" in prompt
+            or "how is my business" in prompt
+            or "today summary" in prompt
+        ):
+
+            result = get_business_summary()
 
             return {
                 "response": result
