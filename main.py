@@ -161,6 +161,53 @@ def extract_customer(prompt):
             return customer["name"]
 
     return "No Customer Found"
+
+def create_sale(customer, product, qty):
+
+    # Product Find
+    product_data = (
+        supabase.table("products")
+        .select("*")
+        .eq("name", product)
+        .execute()
+    )
+
+    if not product_data.data:
+        return "❌ Product Not Found"
+
+    p = product_data.data[0]
+
+    stock = int(p["stock"])
+
+    if stock < qty:
+        return "❌ Not enough stock available"
+
+    total = qty * float(p["price"])
+
+    # Insert Sale
+    supabase.table("sales").insert({
+        "customer": customer,
+        "product": product,
+        "quantity": qty,
+        "total": total
+    }).execute()
+
+    # Update Stock
+    supabase.table("products").update({
+        "stock": stock - qty
+    }).eq("id", p["id"]).execute()
+
+    return f"""
+✅ Sale Created Successfully
+
+👤 Customer : {customer}
+
+📦 Product : {product}
+
+🔢 Quantity : {qty}
+
+💰 Total : ₹{total}
+"""
     
 
     
