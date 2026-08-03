@@ -124,6 +124,17 @@ def find_customer(customer_name):
 
     return None
 
+import re
+
+def extract_quantity(prompt):
+    match = re.search(r"\d+", prompt)
+
+    if match:
+        return int(match.group())
+
+    return 1
+    
+
 
 
 @app.post("/chat")
@@ -184,10 +195,17 @@ def chat(request: ChatRequest):
 """
             }
                     # Sell Product Command
-        if "sell" in prompt:
-            return {
-                "response": "🛒 Sale command detected. AI is ready to create the sale."
-            }
+        # Sell Product Command
+if "sell" in prompt:
+
+    qty = extract_quantity(prompt)
+
+    return {
+        "response": f"🛒 Quantity Detected: {qty}"
+    }
+            
+                
+            
 
         
 
