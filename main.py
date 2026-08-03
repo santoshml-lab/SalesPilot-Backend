@@ -236,6 +236,77 @@ def create_sale(customer_name, product_name, qty):
 """
 
 
+def get_customer_id(customer_name):
+    response = (
+        supabase.table("customers")
+        .select("*")
+        .eq("name", customer_name)
+        .execute()
+    )
+
+    if not response.data:
+        return None
+
+    return response.data[0]["id"]
+
+def get_product_name(product_id):
+    response = (
+        supabase.table("products")
+        .select("*")
+        .eq("id", product_id)
+        .execute()
+    )
+
+    if not response.data:
+        return "Unknown Product"
+
+    return response.data[0]["name"]
+
+def get_purchase_history(customer_name):
+
+    customer_id = get_customer_id(customer_name)
+
+    if customer_id is None:
+        return "❌ Customer Not Found"
+
+    response = (
+        supabase.table("sales")
+        .select("*")
+        .eq("customer_id", customer_id)
+        .execute()
+    )
+
+    sales = response.data or []
+
+    if not sales:
+        return "📭 No Purchase History Found"
+
+    text = f"📜 Purchase History\n\n👤 Customer : {customer_name}\n\n"
+
+    total_spent = 0
+
+    for sale in sales:
+
+        product_name = get_product_name(sale["product_id"])
+
+        text += (
+            f"📦 {product_name}\n"
+            f"Quantity : {sale['quantity']}\n"
+            f"Total : ₹{sale['total']}\n\n"
+        )
+
+        total_spent += float(sale["total"])
+
+    text += f"💰 Total Spent : ₹{total_spent}"
+
+    return text
+    
+    
+        
+        
+        
+
+
 
 
 
