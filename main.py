@@ -196,6 +196,7 @@ def create_sale(customer_name, product_name, qty):
         return "❌ Not enough stock available"
 
     total = qty * float(product["price"])
+    invoice_no = f"INV-{customer['id']}{product['id']}{qty}"
 
     # Insert Sale
     supabase.table("sales").insert({
@@ -209,9 +210,19 @@ def create_sale(customer_name, product_name, qty):
     supabase.table("products").update({
         "stock": stock - qty
     }).eq("id", product["id"]).execute()
+    supabase.table("invoices").insert({
+    "invoice_no": invoice_no,
+    "customer_name": customer_name,
+    "product_name": product_name,
+    "quantity": qty,
+    "total": total,
+    "status": "Paid"
+  }).execute()
 
     return f"""
 ✅ Sale Created Successfully
+
+🧾 Invoice No : {invoice_no}
 
 👤 Customer : {customer_name}
 
@@ -220,7 +231,19 @@ def create_sale(customer_name, product_name, qty):
 🔢 Quantity : {qty}
 
 💰 Total : ₹{total}
+
+📄 Invoice Saved Successfully
 """
+
+
+
+
+
+
+
+
+
+
 
     
     
