@@ -152,13 +152,18 @@ def extract_customer(prompt):
 
     customers = response.data or []
 
-    prompt = prompt.lower()
+    prompt = prompt.lower().strip()
 
     for customer in customers:
-        if customer["name"].lower() in prompt:
+        name = customer["name"].lower().strip()
+
+        if name in prompt:
             return customer["name"]
 
     return "No Customer Found"
+    
+
+    
     
 
     
