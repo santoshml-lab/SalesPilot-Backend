@@ -194,15 +194,30 @@ def chat(request: ChatRequest):
 🔴 Low Stock Products : {low_stock}
 """
             }
-                    # Sell Product Command
+
         # Sell Product Command
-if "sell" in prompt:
+      if "sell" in prompt:
 
-    qty = extract_quantity(prompt)
+         qty = extract_quantity(prompt)
 
-    return {
-        "response": f"🛒 Quantity Detected: {qty}"
+          return {
+              "response": f"🛒 Quantity Detected: {qty}"
     }
+
+
+    
+
+    
+        
+    
+                    
+        
+
+
+    
+
+    
+    
             
                 
             
