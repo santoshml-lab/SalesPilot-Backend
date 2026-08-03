@@ -367,6 +367,51 @@ def get_monthly_sales():
         text += f"📅 {month} : ₹{revenue}\n"
 
     return text
+
+def get_best_customer():
+
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    if not sales:
+        return "📭 No Sales Found"
+
+    customer_spending = {}
+
+    for sale in sales:
+
+        customer_id = sale["customer_id"]
+        total = float(sale["total"])
+
+        if customer_id in customer_spending:
+            customer_spending[customer_id] += total
+        else:
+            customer_spending[customer_id] = total
+
+    best_customer_id = max(
+        customer_spending,
+        key=customer_spending.get
+    )
+
+    customer_response = (
+        supabase.table("customers")
+        .select("*")
+        .eq("id", best_customer_id)
+        .execute()
+    )
+
+    customer_name = customer_response.data[0]["name"]
+
+    total_spent = customer_spending[best_customer_id]
+
+    return f"""
+🏆 Best Customer
+
+👤 Name : {customer_name}
+
+💰 Total Spending : ₹{total_spent}
+"""
     
     
         
@@ -480,6 +525,19 @@ def chat(request: ChatRequest):
         ):
 
             result = get_monthly_sales()
+
+            return {
+                "response": result
+            }
+
+                # Best Customer Tool
+        if (
+            "best customer" in prompt
+            or "top customer" in prompt
+            or "highest spending customer" in prompt
+        ):
+
+            result = get_best_customer()
 
             return {
                 "response": result
