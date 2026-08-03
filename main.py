@@ -561,6 +561,52 @@ def get_best_customer():
         "total": customer_total[best_customer_id]
     }
 
+def get_top_product():
+
+    response = supabase.table("sales").select("*").execute()
+
+    sales = response.data or []
+
+    product_sales = {}
+
+    for sale in sales:
+
+        pid = sale["product_id"]
+
+        if pid not in product_sales:
+            product_sales[pid] = {
+                "quantity": 0,
+                "revenue": 0
+            }
+
+        product_sales[pid]["quantity"] += int(sale["quantity"])
+        product_sales[pid]["revenue"] += float(sale["total"])
+
+    if not product_sales:
+        return None
+
+    top_id = max(
+        product_sales,
+        key=lambda x: product_sales[x]["quantity"]
+    )
+
+    product = (
+        supabase.table("products")
+        .select("*")
+        .eq("id", top_id)
+        .execute()
+    )
+
+    return {
+        "name": product.data[0]["name"],
+        "sold": product_sales[top_id]["quantity"],
+        "revenue": product_sales[top_id]["revenue"]
+    }
+
+@app.get("/top-product")
+def top_product():
+    return get_top_product()
+
 @app.get("/best-customer")
 def best_customer():
     return get_best_customer()
