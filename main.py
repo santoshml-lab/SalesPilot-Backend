@@ -75,6 +75,22 @@ def get_total_customers():
     customers = response.data or []
 
     return len(customers)
+ def get_inventory_summary():
+    response = supabase.table("products").select("*").execute()
+
+    products = response.data or []
+
+    total_products = len(products)
+
+    total_stock = sum(int(p["stock"]) for p in products)
+
+    low_stock = sum(
+        1
+        for p in products
+        if int(p["stock"]) <= int(p["low_stock_limit"])
+    )
+
+    return total_products, total_stock, low_stock   
 
 
 @app.post("/chat")
@@ -113,6 +129,21 @@ def chat(request: ChatRequest):
 
            return {
                 "response": f"👥 Total Customers: {total_customers}"
+    }
+            # Inventory Summary Tool
+       if "inventory" in prompt or "inventory summary" in prompt:
+           total_products, total_stock, low_stock = get_inventory_summary()
+
+           return {
+                "response":
+                f"""📦 Inventory Summary
+
+📦 Total Products : {total_products}
+
+📊 Total Stock Units : {total_stock}
+
+🔴 Low Stock Products : {low_stock}
+"""
     }
 
         # Normal AI Chat
