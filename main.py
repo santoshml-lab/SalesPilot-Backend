@@ -139,11 +139,16 @@ def extract_product(prompt):
 
     products = response.data or []
 
+    prompt = prompt.lower()
+
     for product in products:
-        if product["name"].lower() in prompt.lower():
+        if product["name"].lower() in prompt:
             return product["name"]
 
-    return None
+    return "No Product Found"
+    
+
+    
     
 
 
