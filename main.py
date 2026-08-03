@@ -183,12 +183,22 @@ def chat(request: ChatRequest):
 🔴 Low Stock Products : {low_stock}
 """
             }
+                    # Sell Product Command
+        if "sell" in prompt:
+            return {
+                "response": "🛒 Sale command detected. AI is ready to create the sale."
+            }
 
-        # Sell Product Command
-if "sell" in prompt:
-    return {
-        "response": "🛒 Sale command detected. AI is ready to create the sale."
-    }
+        
+
+        
+
+
+        
+
+    
+        
+    
 
 
 
