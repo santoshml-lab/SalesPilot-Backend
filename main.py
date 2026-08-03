@@ -69,6 +69,12 @@ def get_today_revenue():
     revenue = sum(float(item["total"]) for item in sales)
 
     return revenue
+def get_total_customers():
+    response = supabase.table("customers").select("*").execute()
+
+    customers = response.data or []
+
+    return len(customers)
 
 
 @app.post("/chat")
@@ -102,6 +108,12 @@ def chat(request: ChatRequest):
             return {
                 "response": f"💰 Total Revenue: ₹{revenue}"
             }
+        if "customers" in prompt or "total customers" in prompt:
+           total_customers = get_total_customers()
+
+    return {
+        "response": f"👥 Total Customers: {total_customers}"
+    }
 
         # Normal AI Chat
         response = client.chat.completions.create(
