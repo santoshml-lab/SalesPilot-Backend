@@ -211,7 +211,7 @@ def create_sale(customer_name, product_name, qty):
     total = qty * float(product["price"])
     invoice_no = f"INV-{customer['id']}{product['id']}{qty}"
 
-    # Insert Sale
+    # Save Sale
     supabase.table("sales").insert({
         "customer_id": customer["id"],
         "product_id": product["id"],
@@ -220,42 +220,36 @@ def create_sale(customer_name, product_name, qty):
     }).execute()
 
     # Update Stock
-new_stock = stock - qty
+    new_stock = stock - qty
 
-supabase.table("products").update({
-    "stock": new_stock
-}).eq("id", product["id"]).execute()
+    supabase.table("products").update({
+        "stock": new_stock
+    }).eq("id", product["id"]).execute()
 
-   # Low Stock Notification
-  if new_stock <= int(product["low_stock_limit"]):
+    # Save Invoice
+    supabase.table("invoices").insert({
+        "invoice_no": invoice_no,
+        "customer_name": customer_name,
+        "product_name": product_name,
+        "quantity": qty,
+        "total": total,
+        "status": "Paid"
+    }).execute()
+
+    # Sale Notification
     create_notification(
-        "Low Stock Alert",
-        f"{product_name} stock is low ({new_stock} left)",
-        "warning"
+        "Sale Completed",
+        f"{qty} x {product_name} sold to {customer_name}",
+        "success"
     )
 
-# Save Invoice
-supabase.table("invoices").insert({
-    "invoice_no": invoice_no,
-    "customer_name": customer_name,
-    "product_name": product_name,
-    "quantity": qty,
-    "total": total,
-    "status": "Paid"
-}).execute()
-
-# Sale Notification
-create_notification(
-    "Sale Completed",
-    f"{qty} x {product_name} sold to {customer_name}",
-    "success"
-)
-    
-        
-    
-
-  
-     
+    # Low Stock Notification
+    if new_stock <= int(product["low_stock_limit"]):
+        create_notification(
+            "Low Stock Alert",
+            f"{product_name} stock is low ({new_stock} left)",
+            "warning"
+        )
 
     return f"""
 ✅ Sale Created Successfully
@@ -272,6 +266,16 @@ create_notification(
 
 📄 Invoice Saved Successfully
 """
+
+
+
+    
+    
+
+    
+
+
+ 
 
 
 def get_customer_id(customer_name):
