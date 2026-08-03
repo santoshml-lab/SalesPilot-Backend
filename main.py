@@ -138,12 +138,12 @@ def chat(request: ChatRequest):
                 "response":
                 f"""📦 Inventory Summary
 
-📦 Total Products : {total_products}
+             📦 Total Products : {total_products}
 
-📊 Total Stock Units : {total_stock}
+             📊 Total Stock Units : {total_stock}
 
-🔴 Low Stock Products : {low_stock}
-"""
+             🔴 Low Stock Products : {low_stock}
+             """
     }
 
         # Normal AI Chat
