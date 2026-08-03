@@ -81,6 +81,14 @@ def get_total_customers():
 
     return len(customers)
 
+def create_notification(title, message, type_):
+
+    supabase.table("notifications").insert({
+        "title": title,
+        "message": message,
+        "type": type_
+    }).execute()
+
 
 def get_inventory_summary():
     response = supabase.table("products").select("*").execute()
@@ -223,6 +231,11 @@ def create_sale(customer_name, product_name, qty):
     "total": total,
     "status": "Paid"
   }).execute()
+    create_notification(
+    "Sale Completed",
+    f"{qty} x {product_name} sold to {customer_name}",
+    "success"
+    )
 
     return f"""
 ✅ Sale Created Successfully
