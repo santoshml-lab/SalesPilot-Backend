@@ -226,7 +226,7 @@ def chat(request: ChatRequest):
 
 
         # Sell Product Command
-       if "sell" in prompt:
+        if "sell" in prompt:
 
          qty = extract_quantity(prompt)
          product = extract_product(prompt)
