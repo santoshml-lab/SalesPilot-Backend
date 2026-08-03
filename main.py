@@ -386,16 +386,25 @@ def chat(request: ChatRequest):
 """
             }
 
+
         # Purchase History Tool
-       if "purchase history" in prompt:
+        if "purchase history" in prompt:
 
-    customer = extract_customer(prompt)
+            customer = extract_customer(prompt)
 
-    result = get_purchase_history(customer)
+            result = get_purchase_history(customer)
 
             return {
-        "response": result
-    }
+                "response": result
+            }
+
+        
+       
+
+    
+
+    
+    
             
 
 
