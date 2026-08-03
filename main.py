@@ -276,19 +276,26 @@ def chat(request: ChatRequest):
 """
             }
 
+                # Sell Product Command
+        if "sell" in prompt:
 
-        # Sell Product Command
-      if "sell" in prompt:
+            qty = extract_quantity(prompt)
+            product = extract_product(prompt)
+            customer = extract_customer(prompt)
 
-    qty = extract_quantity(prompt)
-    product = extract_product(prompt)
-    customer = extract_customer(prompt)
+            result = create_sale(customer, product, qty)
 
-    result = create_sale(customer, product, qty)
+            return {
+                "response": result
+            }
 
-           return {
-        "response": result
-    }
+
+        
+      
+
+    
+    
+    
             
 
         
