@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from groq import Groq
 from dotenv import load_dotenv
 from supabase import create_client
+from fastapi.responses import FileResponse
+from reportlab.pdfgen import canvas
+import tempfile
 import os
 
 load_dotenv()
@@ -602,6 +605,50 @@ def get_top_product():
         "sold": product_sales[top_id]["quantity"],
         "revenue": product_sales[top_id]["revenue"]
     }
+
+@app.get("/invoice/{invoice_no}")
+def download_invoice(invoice_no: str):
+
+    response = (
+        supabase.table("invoices")
+        .select("*")
+        .eq("invoice_no", invoice_no)
+        .execute()
+    )
+
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Invoice Not Found")
+
+    invoice = response.data[0]
+
+    pdf_path = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".pdf"
+    ).name
+
+    c = canvas.Canvas(pdf_path)
+
+    c.setFont("Helvetica-Bold",18)
+    c.drawString(200,800,"FlowPilot Invoice")
+
+    c.setFont("Helvetica",12)
+
+    c.drawString(50,750,f"Invoice : {invoice['invoice_no']}")
+    c.drawString(50,725,f"Customer : {invoice['customer_name']}")
+    c.drawString(50,700,f"Product : {invoice['product_name']}")
+    c.drawString(50,675,f"Quantity : {invoice['quantity']}")
+    c.drawString(50,650,f"Total : ₹{invoice['total']}")
+    c.drawString(50,625,f"Status : {invoice['status']}")
+
+    c.save()
+
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename=f"{invoice_no}.pdf"
+    )
+
+
 
 @app.get("/top-product")
 def top_product():
