@@ -48,10 +48,6 @@ def health():
 
 def get_low_stock_products():
     response = supabase.table("products").select("*").execute()
-        
-          
-        
-    
 
     products = response.data or []
 
@@ -61,6 +57,8 @@ def get_low_stock_products():
     ]
 
     return low_stock
+
+
 def get_today_revenue():
     response = supabase.table("sales").select("*").execute()
 
@@ -69,6 +67,8 @@ def get_today_revenue():
     revenue = sum(float(item["total"]) for item in sales)
 
     return revenue
+
+
 def get_total_customers():
     response = supabase.table("customers").select("*").execute()
 
@@ -84,24 +84,23 @@ def get_inventory_summary():
 
     total_products = len(products)
 
-    total_stock = sum(int(p["stock"]) for p in products)
+    total_stock = sum(
+        int(product["stock"])
+        for product in products
+    )
 
     low_stock = sum(
         1
-        for p in products
-        if int(p["stock"]) <= int(p["low_stock_limit"])
+        for product in products
+        if int(product["stock"])
+        <= int(product["low_stock_limit"])
     )
 
     return total_products, total_stock, low_stock
-    
-
-    
-
 
 @app.post("/chat")
 def chat(request: ChatRequest):
     try:
-
         prompt = request.prompt.lower()
 
         # Low Stock Tool
@@ -129,28 +128,25 @@ def chat(request: ChatRequest):
             return {
                 "response": f"💰 Total Revenue: ₹{revenue}"
             }
-            # Revenue Tool
-       if "today revenue" in prompt or "revenue" in prompt:
-          revenue = get_today_revenue()
 
-           return {
-               "response": f"💰 Total Revenue: ₹{revenue}"
-    }
+        # Customers Tool
+        if "customers" in prompt or "total customers" in prompt:
+            total_customers = get_total_customers()
 
-# Customers Tool
-      if "customers" in prompt or "total customers" in prompt:
-         total_customers = get_total_customers()
+            return {
+                "response": f"👥 Total Customers: {total_customers}"
+            }
 
-         return {
-             "response": f"👥 Total Customers: {total_customers}"
-    }
+        # Inventory Summary Tool
+        if (
+            "inventory" in prompt
+            or "inventory summary" in prompt
+            or "stock" in prompt
+        ):
+            total_products, total_stock, low_stock = get_inventory_summary()
 
-# Inventory Summary Tool
-     if "inventory" in prompt or "inventory summary" in prompt:
-    total_products, total_stock, low_stock = get_inventory_summary()
-
-         return {
-             "response": f"""📦 Inventory Summary
+            return {
+                "response": f"""📦 Inventory Summary
 
 📦 Total Products : {total_products}
 
@@ -158,12 +154,7 @@ def chat(request: ChatRequest):
 
 🔴 Low Stock Products : {low_stock}
 """
-    }
-           
-    
-            
-             
-    
+            }
 
         # Normal AI Chat
         response = client.chat.completions.create(
