@@ -223,6 +223,14 @@ def create_sale(customer_name, product_name, qty):
     supabase.table("products").update({
         "stock": stock - qty
     }).eq("id", product["id"]).execute()
+    new_stock = stock - qty
+
+  if new_stock <= int(product["low_stock_limit"]):
+     create_notification(
+        "Low Stock Alert",
+        f"{product_name} stock is low ({new_stock} left)",
+        "warning"
+    )
     supabase.table("invoices").insert({
     "invoice_no": invoice_no,
     "customer_name": customer_name,
@@ -771,6 +779,19 @@ def send_invoice(invoice_no: str):
     })
 
     return {"message": "Invoice sent successfully"}
+
+@app.get("/notifications")
+def get_notifications():
+
+    response = (
+        supabase.table("notifications")
+        .select("*")
+        .order("id", desc=True)
+        .limit(20)
+        .execute()
+    )
+
+    return response.data
     
     
         
