@@ -224,16 +224,15 @@ def chat(request: ChatRequest):
 """
             }
 
+                # Sell Product Command
+        if "sell" in prompt:
 
-        # Sell Product Command
-      if "sell" in prompt:
+            qty = extract_quantity(prompt)
+            product = extract_product(prompt)
+            customer = extract_customer(prompt)
 
-         qty = extract_quantity(prompt)
-         product = extract_product(prompt)
-         customer = extract_customer(prompt)
-
-           return {
-              "response": f"""
+            return {
+                "response": f"""
 🛒 SELL TOOL
 
 👤 Customer : {customer}
@@ -242,7 +241,21 @@ def chat(request: ChatRequest):
 
 🔢 Quantity : {qty}
 """
-    }
+            }
+
+        
+
+
+        
+      
+
+
+
+         
+
+
+
+    
 
                 
         
