@@ -226,8 +226,8 @@ supabase.table("products").update({
     "stock": new_stock
 }).eq("id", product["id"]).execute()
 
-# Low Stock Notification
-if new_stock <= int(product["low_stock_limit"]):
+   # Low Stock Notification
+  if new_stock <= int(product["low_stock_limit"]):
     create_notification(
         "Low Stock Alert",
         f"{product_name} stock is low ({new_stock} left)",
