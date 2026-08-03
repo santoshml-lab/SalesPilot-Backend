@@ -447,6 +447,58 @@ def get_business_summary():
 {top_products}
 """
 
+def get_ai_insights():
+
+    revenue = get_today_revenue()
+
+    customers = get_total_customers()
+
+    products, stock, low_stock = get_inventory_summary()
+
+    prompt = f"""
+You are an ERP Business Analyst.
+
+Business Data:
+
+Revenue : ₹{revenue}
+
+Customers : {customers}
+
+Products : {products}
+
+Stock Units : {stock}
+
+Low Stock : {low_stock}
+
+Give:
+
+1. Business Summary
+2. Risks
+3. Opportunities
+4. Recommendations
+
+Keep response short.
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+
+@app.get("/insights")
+def insights():
+
+    return {
+        "insights": get_ai_insights()
+    }
+
 @app.get("/dashboard")
 def dashboard():
 
