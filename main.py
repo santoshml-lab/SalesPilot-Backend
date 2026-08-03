@@ -219,6 +219,7 @@ def create_sale(customer_name, product_name, qty):
         "total": total
     }).execute()
     # Update Stock
+new_stock = stock - qty
 
 supabase.table("products").update({
     "stock": new_stock
@@ -226,17 +227,22 @@ supabase.table("products").update({
 
 # Save Invoice
 supabase.table("invoices").insert({
-    ...
+    "invoice_no": invoice_no,
+    "customer_name": customer_name,
+    "product_name": product_name,
+    "quantity": qty,
+    "total": total,
+    "status": "Paid"
 }).execute()
 
-# Always create Sale notification
+# Sale Notification
 create_notification(
     "Sale Completed",
     f"{qty} x {product_name} sold to {customer_name}",
     "success"
 )
 
-# Only create Low Stock notification if needed
+# Low Stock Notification
 if new_stock <= int(product["low_stock_limit"]):
     create_notification(
         "Low Stock Alert",
@@ -244,15 +250,7 @@ if new_stock <= int(product["low_stock_limit"]):
         "warning"
     )
 
-    
-    
-
-    
-        
-    
-        
-
-    return f"""
+return f"""
 ✅ Sale Created Successfully
 
 🧾 Invoice No : {invoice_no}
@@ -267,6 +265,12 @@ if new_stock <= int(product["low_stock_limit"]):
 
 📄 Invoice Saved Successfully
 """
+    
+
+
+
+
+
 
 
 
