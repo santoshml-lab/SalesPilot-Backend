@@ -111,8 +111,8 @@ def chat(request: ChatRequest):
         if "customers" in prompt or "total customers" in prompt:
            total_customers = get_total_customers()
 
-    return {
-        "response": f"👥 Total Customers: {total_customers}"
+           return {
+                "response": f"👥 Total Customers: {total_customers}"
     }
 
         # Normal AI Chat
