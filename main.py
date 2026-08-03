@@ -492,6 +492,48 @@ Keep response short.
 
     return response.choices[0].message.content
 
+def get_recent_sales():
+
+    response = (
+        supabase.table("sales")
+        .select("*")
+        .order("created_at", desc=True)
+        .limit(5)
+        .execute()
+    )
+
+    sales = response.data or []
+
+    result = []
+
+    for sale in sales:
+
+        customer = (
+            supabase.table("customers")
+            .select("name")
+            .eq("id", sale["customer_id"])
+            .execute()
+        )
+
+        product = (
+            supabase.table("products")
+            .select("name")
+            .eq("id", sale["product_id"])
+            .execute()
+        )
+
+        result.append({
+            "customer": customer.data[0]["name"] if customer.data else "Unknown",
+            "product": product.data[0]["name"] if product.data else "Unknown",
+            "total": sale["total"]
+        })
+
+    return result
+
+@app.get("/recent-sales")
+def recent_sales():
+    return get_recent_sales()
+
 @app.get("/insights")
 def insights():
 
