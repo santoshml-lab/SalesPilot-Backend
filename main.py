@@ -7,9 +7,11 @@ from supabase import create_client
 from fastapi.responses import FileResponse
 from reportlab.pdfgen import canvas
 import tempfile
+import resend
 import os
 
 load_dotenv()
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 app = FastAPI(title="FlowPilot AI API")
 
@@ -706,6 +708,50 @@ def dashboard():
         "low_stock": low_stock,
         "best_customer": best_customer
     }
+
+@app.post("/send-invoice/{invoice_no}")
+def send_invoice(invoice_no: str):
+
+    invoice = (
+        supabase.table("invoices")
+        .select("*")
+        .eq("invoice_no", invoice_no)
+        .execute()
+    )
+
+    if not invoice.data:
+        raise HTTPException(status_code=404, detail="Invoice Not Found")
+
+    invoice = invoice.data[0]
+
+    customer = (
+        supabase.table("customers")
+        .select("*")
+        .eq("name", invoice["customer_name"])
+        .execute()
+    )
+
+    if not customer.data:
+        raise HTTPException(status_code=404, detail="Customer Not Found")
+
+    email = customer.data[0]["email"]
+
+    resend.Emails.send({
+        "from": "FlowPilot <onboarding@resend.dev>",
+        "to": [email],
+        "subject": f"Invoice {invoice_no}",
+        "html": f"""
+        <h2>FlowPilot Invoice</h2>
+        <p><b>Invoice:</b> {invoice['invoice_no']}</p>
+        <p><b>Customer:</b> {invoice['customer_name']}</p>
+        <p><b>Product:</b> {invoice['product_name']}</p>
+        <p><b>Quantity:</b> {invoice['quantity']}</p>
+        <p><b>Total:</b> ₹{invoice['total']}</p>
+        <p>Thank you for choosing FlowPilot.</p>
+        """
+    })
+
+    return {"message": "Invoice sent successfully"}
     
     
         
