@@ -446,6 +446,26 @@ def get_business_summary():
 
 {top_products}
 """
+
+@app.get("/dashboard")
+def dashboard():
+
+    revenue = get_today_revenue()
+
+    customers = get_total_customers()
+
+    products, stock, low_stock = get_inventory_summary()
+
+    best_customer = get_best_customer()
+
+    return {
+        "revenue": revenue,
+        "customers": customers,
+        "products": products,
+        "stock": stock,
+        "low_stock": low_stock,
+        "best_customer": best_customer
+    }
     
     
         
