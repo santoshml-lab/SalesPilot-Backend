@@ -311,11 +311,6 @@ def get_purchase_history(customer_name):
 
 
 
-
-
-
-
-
     
     
     
