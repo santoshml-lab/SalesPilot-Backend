@@ -645,6 +645,15 @@ def get_top_product():
         "revenue": product_sales[top_id]["revenue"]
     }
 
+@app.get("/test-notification")
+def test_notification():
+    create_notification(
+        "Test Notification",
+        "Backend is working",
+        "info"
+    )
+    return {"message": "Notification inserted"}
+
 
 
     
