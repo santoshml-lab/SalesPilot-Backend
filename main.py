@@ -160,24 +160,9 @@ def extract_product(prompt):
 
     return "No Product Found"
 
-def extract_customer(prompt):
-    response = supabase.table("customers").select("*").execute()
-
-    customers = response.data or []
-
-    prompt = prompt.lower().strip()
-
-    for customer in customers:
-        name = customer["name"].lower().strip()
-
-        if name in prompt:
-            return customer["name"]
-
-    return "No Customer Found"
-
 def create_sale(customer_name, product_name, qty):
 
-    # Customer Find
+    # Find Customer
     customer_data = (
         supabase.table("customers")
         .select("*")
@@ -190,7 +175,7 @@ def create_sale(customer_name, product_name, qty):
 
     customer = customer_data.data[0]
 
-    # Product Find
+    # Find Product
     product_data = (
         supabase.table("products")
         .select("*")
@@ -211,46 +196,47 @@ def create_sale(customer_name, product_name, qty):
     total = qty * float(product["price"])
     invoice_no = f"INV-{customer['id']}{product['id']}{qty}"
 
-    # Save Sale
+    # Insert Sale
     supabase.table("sales").insert({
         "customer_id": customer["id"],
         "product_id": product["id"],
         "quantity": qty,
         "total": total
     }).execute()
+
     # Update Stock
-new_stock = stock - qty
+    new_stock = stock - qty
 
-supabase.table("products").update({
-    "stock": new_stock
-}).eq("id", product["id"]).execute()
+    supabase.table("products").update({
+        "stock": new_stock
+    }).eq("id", product["id"]).execute()
 
-# Save Invoice
-supabase.table("invoices").insert({
-    "invoice_no": invoice_no,
-    "customer_name": customer_name,
-    "product_name": product_name,
-    "quantity": qty,
-    "total": total,
-    "status": "Paid"
-}).execute()
+    # Insert Invoice
+    supabase.table("invoices").insert({
+        "invoice_no": invoice_no,
+        "customer_name": customer_name,
+        "product_name": product_name,
+        "quantity": qty,
+        "total": total,
+        "status": "Paid"
+    }).execute()
 
-# Sale Notification
-create_notification(
-    "Sale Completed",
-    f"{qty} x {product_name} sold to {customer_name}",
-    "success"
-)
-
-# Low Stock Notification
-if new_stock <= int(product["low_stock_limit"]):
+    # Sale Notification
     create_notification(
-        "Low Stock Alert",
-        f"{product_name} stock is low ({new_stock} left)",
-        "warning"
+        "Sale Completed",
+        f"{qty} x {product_name} sold to {customer_name}",
+        "success"
     )
 
-return f"""
+    # Low Stock Notification
+    if new_stock <= int(product["low_stock_limit"]):
+        create_notification(
+            "Low Stock Alert",
+            f"{product_name} stock is low ({new_stock} left)",
+            "warning"
+        )
+
+    return f"""
 ✅ Sale Created Successfully
 
 🧾 Invoice No : {invoice_no}
@@ -265,6 +251,14 @@ return f"""
 
 📄 Invoice Saved Successfully
 """
+
+
+
+    
+
+    
+        
+
     
 
 
