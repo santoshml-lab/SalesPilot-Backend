@@ -36,6 +36,45 @@ MODEL = "openai/gpt-oss-20b"
 class ChatRequest(BaseModel):
     prompt: str
 
+from pydantic import BaseModel
+
+class SettingsRequest(BaseModel):
+    company_name: str
+    owner_name: str
+    email: str
+    phone: str
+    address: str
+
+@app.post("/settings")
+def save_settings(settings: SettingsRequest):
+
+    supabase.table("settings").delete().neq("id", 0).execute()
+
+    supabase.table("settings").insert({
+        "company_name": settings.company_name,
+        "owner_name": settings.owner_name,
+        "email": settings.email,
+        "phone": settings.phone,
+        "address": settings.address
+    }).execute()
+
+    return {"message": "Settings Saved Successfully"}
+
+@app.get("/settings")
+def get_settings():
+
+    response = (
+        supabase.table("settings")
+        .select("*")
+        .limit(1)
+        .execute()
+    )
+
+    if response.data:
+        return response.data[0]
+
+    return {}
+
 
 @app.get("/")
 def root():
