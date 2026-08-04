@@ -750,9 +750,20 @@ def download_invoice(invoice_no: str):
         .execute()
     )
 
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Invoice Not Found")
-        invoice = response.data[0]
+if not response.data:
+    raise HTTPException(status_code=404, detail="Invoice Not Found")
+
+invoice = response.data[0]
+    
+    
+
+
+
+
+
+    
+        
+        
 
 settings = (
     supabase.table("settings")
@@ -803,14 +814,21 @@ c.drawString(50, 700, f"Product : {invoice['product_name']}")
 c.drawString(50, 675, f"Quantity : {invoice['quantity']}")
 c.drawString(50, 650, f"Total : ₹{invoice['total']}")
 c.drawString(50, 625, f"Status : {invoice['status']}")
-
 c.save()
 
-           return FileResponse(
+return FileResponse(
     pdf_path,
     media_type="application/pdf",
     filename=f"{invoice_no}.pdf"
 )
+
+
+
+           
+    
+    
+    
+
 
     
     
