@@ -75,6 +75,36 @@ def get_settings():
 
     return {}
 
+from fastapi import UploadFile, File
+
+@app.post("/upload-logo")
+async def upload_logo(file: UploadFile = File(...)):
+    file_path = f"logos/{file.filename}"
+
+    contents = await file.read()
+
+    supabase.storage.from_("products").upload(
+        file_path,
+        contents,
+        {"content-type": file.content_type},
+    )
+
+    logo_url = supabase.storage.from_("products").get_public_url(file_path)
+
+    settings = (
+        supabase.table("settings")
+        .select("*")
+        .limit(1)
+        .execute()
+    )
+
+    if settings.data:
+        supabase.table("settings").update(
+            {"logo": logo_url}
+        ).eq("id", settings.data[0]["id"]).execute()
+
+    return {"logo": logo_url}
+
 
 @app.get("/")
 def root():
