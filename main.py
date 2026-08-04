@@ -49,14 +49,23 @@ class SettingsRequest(BaseModel):
 def save_settings(settings: SettingsRequest):
 
     supabase.table("settings").delete().neq("id", 0).execute()
-
     supabase.table("settings").insert({
-        "company_name": settings.company_name,
-        "owner_name": settings.owner_name,
-        "email": settings.email,
-        "phone": settings.phone,
-        "address": settings.address
-    }).execute()
+    "company_name": settings.company_name,
+    "owner_name": settings.owner_name,
+    "email": settings.email,
+    "phone": settings.phone,
+    "address": settings.address,
+    "logo_url": ""
+}).execute()
+
+    
+        
+        
+        
+        
+        
+        
+    
 
     return {"message": "Settings Saved Successfully"}
 
@@ -100,8 +109,9 @@ async def upload_logo(file: UploadFile = File(...)):
 
     if settings.data:
         supabase.table("settings").update(
-            {"logo": logo_url}
-        ).eq("id", settings.data[0]["id"]).execute()
+       {"logo_url": logo_url}
+    ).eq("id", settings.data[0]["id"]).execute()
+               
 
     return {"logo": logo_url}
 
