@@ -9,6 +9,8 @@ from reportlab.pdfgen import canvas
 import tempfile
 import resend
 import os
+import requests
+from reportlab.lib.utils import ImageReader
 
 load_dotenv()
 resend.api_key = os.getenv("RESEND_API_KEY")
