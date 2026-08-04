@@ -754,6 +754,17 @@ def download_invoice(invoice_no: str):
         raise HTTPException(status_code=404, detail="Invoice Not Found")
 
     invoice = response.data[0]
+    settings = (
+    supabase.table("settings")
+    .select("*")
+    .limit(1)
+    .execute()
+)
+
+logo_url = None
+
+if settings.data:
+    logo_url = settings.data[0].get("logo_url")
 
     pdf_path = tempfile.NamedTemporaryFile(
         delete=False,
@@ -761,9 +772,37 @@ def download_invoice(invoice_no: str):
     ).name
 
     c = canvas.Canvas(pdf_path)
+    # Draw Logo
+if logo_url:
+    try:
+        response = requests.get(logo_url)
 
-    c.setFont("Helvetica-Bold",18)
-    c.drawString(200,800,"FlowPilot Invoice")
+        if response.status_code == 200:
+
+            temp_logo = tempfile.NamedTemporaryFile(
+                delete=False,
+                suffix=".png"
+            )
+
+            temp_logo.write(response.content)
+            temp_logo.close()
+
+            c.drawImage(
+                temp_logo.name,
+                40,
+                760,
+                width=70,
+                height=70,
+                preserveAspectRatio=True,
+                mask="auto"
+            )
+
+    except Exception:
+        pass
+
+    c.setFont("Helvetica-Bold",20)
+    c.drawString(130,790,"FlowPilot Invoice")
+    
 
     c.setFont("Helvetica",12)
 
