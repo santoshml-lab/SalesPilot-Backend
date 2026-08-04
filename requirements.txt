@@ -5,5 +5,8 @@ python-dotenv
 supabase
 reportlab
 resend
+requests
+qrcode[pil]
 python-multipart
+pydantic
 
