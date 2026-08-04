@@ -734,12 +734,6 @@ def test_notification():
     )
     return {"message": "Notification inserted"}
 
-
-
-    
-        
-        
-
 @app.get("/invoice/{invoice_no}")
 def download_invoice(invoice_no: str):
 
@@ -750,10 +744,81 @@ def download_invoice(invoice_no: str):
         .execute()
     )
 
-if not response.data:
-    raise HTTPException(status_code=404, detail="Invoice Not Found")
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Invoice Not Found")
 
-invoice = response.data[0]
+    invoice = response.data[0]
+
+    settings = (
+        supabase.table("settings")
+        .select("*")
+        .limit(1)
+        .execute()
+    )
+
+    logo_url = None
+    if settings.data:
+        logo_url = settings.data[0].get("logo_url")
+
+    pdf_path = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".pdf"
+    ).name
+
+    c = canvas.Canvas(pdf_path)
+
+    if logo_url:
+        try:
+            r = requests.get(logo_url)
+            if r.status_code == 200:
+                temp_logo = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                temp_logo.write(r.content)
+                temp_logo.close()
+
+                c.drawImage(
+                    temp_logo.name,
+                    40,
+                    760,
+                    width=70,
+                    height=70,
+                    preserveAspectRatio=True,
+                    mask="auto"
+                )
+        except:
+            pass
+
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(130, 790, "FlowPilot Invoice")
+
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 750, f"Invoice : {invoice['invoice_no']}")
+    c.drawString(50, 725, f"Customer : {invoice['customer_name']}")
+    c.drawString(50, 700, f"Product : {invoice['product_name']}")
+    c.drawString(50, 675, f"Quantity : {invoice['quantity']}")
+    c.drawString(50, 650, f"Total : ₹{invoice['total']}")
+    c.drawString(50, 625, f"Status : {invoice['status']}")
+
+    c.save()
+
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename=f"{invoice_no}.pdf"
+    )
+
+
+
+    
+        
+        
+
+
+
+
+    
+        
+
+
     
     
 
@@ -765,62 +830,11 @@ invoice = response.data[0]
         
         
 
-settings = (
-    supabase.table("settings")
-    .select("*")
-    .limit(1)
-    .execute()
-)
 
-logo_url = None
-if settings.data:
-    logo_url = settings.data[0].get("logo_url")
+    
 
-pdf_path = tempfile.NamedTemporaryFile(
-    delete=False,
-    suffix=".pdf"
-).name
 
-c = canvas.Canvas(pdf_path)
-
-# Draw Logo
-if logo_url:
-    try:
-        r = requests.get(logo_url)
-        if r.status_code == 200:
-            temp_logo = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-            temp_logo.write(r.content)
-            temp_logo.close()
-
-            c.drawImage(
-                temp_logo.name,
-                40,
-                760,
-                width=70,
-                height=70,
-                preserveAspectRatio=True,
-                mask="auto"
-            )
-    except:
-        pass
-
-c.setFont("Helvetica-Bold", 20)
-c.drawString(130, 790, "FlowPilot Invoice")
-
-c.setFont("Helvetica", 12)
-c.drawString(50, 750, f"Invoice : {invoice['invoice_no']}")
-c.drawString(50, 725, f"Customer : {invoice['customer_name']}")
-c.drawString(50, 700, f"Product : {invoice['product_name']}")
-c.drawString(50, 675, f"Quantity : {invoice['quantity']}")
-c.drawString(50, 650, f"Total : ₹{invoice['total']}")
-c.drawString(50, 625, f"Status : {invoice['status']}")
-c.save()
-
-return FileResponse(
-    pdf_path,
-    media_type="application/pdf",
-    filename=f"{invoice_no}.pdf"
-)
+            
 
 
 
