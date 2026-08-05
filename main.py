@@ -1222,6 +1222,7 @@ def chat(request: ChatRequest):
             return {
                 "response": result
             }
+            
 
 
         
