@@ -126,6 +126,53 @@ def root():
         "message": "FlowPilot AI API Running 🚀"
     }
 
+@app.get("/top-products")
+def top_products():
+
+    sales = (
+        supabase.table("sales")
+        .select("product_id, quantity")
+        .execute()
+        .data
+    )
+
+    products = (
+        supabase.table("products")
+        .select("id, name")
+        .execute()
+        .data
+    )
+
+    names = {
+        p["id"]: p["name"]
+        for p in products
+    }
+
+    totals = {}
+
+    for sale in sales:
+
+        pid = sale["product_id"]
+
+        totals[pid] = totals.get(pid, 0) + sale["quantity"]
+
+    result = []
+
+    for pid, qty in totals.items():
+
+        result.append({
+            "product": names.get(pid, "Unknown"),
+            "sold": qty
+        })
+
+    result = sorted(
+        result,
+        key=lambda x: x["sold"],
+        reverse=True
+    )
+
+    return result[:5]
+
 
 @app.get("/health")
 def health():
