@@ -905,17 +905,17 @@ def dashboard():
 @app.post("/send-invoice/{invoice_no}")
 def send_invoice(invoice_no: str):
 
-    invoice = (
+    invoice_response = (
         supabase.table("invoices")
         .select("*")
         .eq("invoice_no", invoice_no)
         .execute()
     )
 
-    if not invoice.data:
+    if not invoice_response.data:
         raise HTTPException(status_code=404, detail="Invoice Not Found")
 
-    invoice = invoice.data[0]
+    invoice = invoice_response.data[0]
 
     # Generate PDF
     pdf_path = generate_invoice_pdf(invoice)
@@ -931,44 +931,42 @@ def send_invoice(invoice_no: str):
         raise HTTPException(status_code=404, detail="Customer Not Found")
 
     email = "santoshkrsbg36@gmail.com"
+
+    # Read PDF
     with open(pdf_path, "rb") as f:
-    pdf_data = f.read()
+        pdf_data = f.read()
 
-resend.Emails.send({
-    "from": "FlowPilot <onboarding@resend.dev>",
-    "to": [email],
-    "subject": f"Invoice {invoice_no}",
-    "html": f"""
-    <h2>FlowPilot Invoice</h2>
-    <p><b>Invoice:</b> {invoice['invoice_no']}</p>
-    <p><b>Customer:</b> {invoice['customer_name']}</p>
-    <p><b>Product:</b> {invoice['product_name']}</p>
-    <p><b>Quantity:</b> {invoice['quantity']}</p>
-    <p><b>Total:</b> ₹{invoice['total']}</p>
-    """,
-    "attachments": [
-        {
-            "filename": f"{invoice_no}.pdf",
-            "content": pdf_data
-        }
-    ]
-})
+    resend.Emails.send({
+        "from": "FlowPilot <onboarding@resend.dev>",
+        "to": [email],
+        "subject": f"Invoice {invoice_no}",
+        "html": f"""
+        <h2>FlowPilot Invoice</h2>
 
-    
-        
-        
-        
-        
-        
+        <p><b>Invoice:</b> {invoice['invoice_no']}</p>
+
+        <p><b>Customer:</b> {invoice['customer_name']}</p>
+
+        <p><b>Product:</b> {invoice['product_name']}</p>
+
+        <p><b>Quantity:</b> {invoice['quantity']}</p>
+
+        <p><b>Total:</b> ₹{invoice['total']}</p>
+        """,
         "attachments": [
             {
                 "filename": f"{invoice_no}.pdf",
-                "path": pdf_path
+                "content": pdf_data
             }
         ]
     })
 
     return {"message": "Invoice sent successfully"}
+
+
+    
+        
+        
 
 
 
