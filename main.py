@@ -196,6 +196,20 @@ def business_analytics():
 
     sales = supabase.table("sales").select("*").execute().data or []
 
+    # Business Health Score
+    health = 100
+
+    if low_stock > 0:
+        health -= min(low_stock * 5, 30)
+
+    if revenue < 5000:
+        health -= 20
+
+    if customers < 10:
+        health -= 10
+
+    health = max(0, min(100, health))
+
     prompt = f"""
 You are FlowPilot AI Business Analyst.
 
@@ -207,6 +221,8 @@ Products: {products}
 Stock Units: {stock}
 Low Stock: {low_stock}
 Orders: {len(sales)}
+
+Business Health Score: {health}%
 
 Generate:
 
@@ -230,8 +246,13 @@ Keep each point short.
     )
 
     return {
+        "health": health,
         "analysis": response.choices[0].message.content
     }
+
+
+
+    
 
 
 
