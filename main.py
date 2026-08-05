@@ -818,6 +818,32 @@ Status : {invoice['status']}
 
     return pdf_path
 
+@app.get("/sales-forecast")
+def sales_forecast():
+
+    response = (
+        supabase.table("sales")
+        .select("total")
+        .execute()
+    )
+
+    sales = response.data or []
+
+    if not sales:
+        return {
+            "forecast": 0
+        }
+
+    totals = [float(s["total"]) for s in sales]
+
+    avg = sum(totals) / len(totals)
+
+    forecast = round(avg * 1.10, 2)
+
+    return {
+        "forecast": forecast
+    }
+
 @app.get("/sales-chart")
 def sales_chart():
 
