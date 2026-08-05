@@ -133,6 +133,37 @@ def health():
         "status": "healthy"
     }
 
+@app.get("/revenue-chart")
+def revenue_chart():
+
+    sales = (
+        supabase.table("sales")
+        .select("created_at,total")
+        .order("created_at")
+        .execute()
+        .data
+    )
+
+    chart = {}
+
+    for sale in sales:
+        date = sale["created_at"][:10]
+
+        if date not in chart:
+            chart[date] = 0
+
+        chart[date] += float(sale["total"])
+
+    result = []
+
+    for date, revenue in chart.items():
+        result.append({
+            "date": date,
+            "revenue": revenue
+        })
+
+    return result
+
 @app.get("/invoices")
 def get_invoices():
 
