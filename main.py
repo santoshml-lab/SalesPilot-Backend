@@ -145,6 +145,47 @@ def get_invoices():
 
     return response.data
 
+@app.get("/business-chat")
+def business_chat(question: str):
+
+    revenue = get_today_revenue()
+    customers = get_total_customers()
+    products, stock, low_stock = get_inventory_summary()
+
+    sales = supabase.table("sales").select("*").execute().data or []
+
+    prompt = f"""
+You are FlowPilot AI Business Consultant.
+
+Business Data:
+
+Revenue: ₹{revenue}
+Customers: {customers}
+Products: {products}
+Stock Units: {stock}
+Low Stock: {low_stock}
+Orders: {len(sales)}
+
+User Question:
+{question}
+
+Answer professionally in short.
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return {
+        "answer": response.choices[0].message.content
+    }
+
 @app.get("/sales-forecast")
 def sales_forecast():
 
