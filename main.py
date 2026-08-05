@@ -929,19 +929,31 @@ def send_invoice(invoice_no: str):
     email = "santoshkrsbg36@gmail.com"
 
     resend.Emails.send({
-        "from": "FlowPilot <onboarding@resend.dev>",
-        "to": [email],
-        "subject": f"Invoice {invoice_no}",
-        "html": f"""
-        <h2>FlowPilot Invoice</h2>
-        <p><b>Invoice:</b> {invoice['invoice_no']}</p>
-        <p><b>Customer:</b> {invoice['customer_name']}</p>
-        <p><b>Product:</b> {invoice['product_name']}</p>
-        <p><b>Quantity:</b> {invoice['quantity']}</p>
-        <p><b>Total:</b> ₹{invoice['total']}</p>
-        <p>Thank you for choosing FlowPilot.</p>
-        """
-    })
+    "from": "FlowPilot <onboarding@resend.dev>",
+    "to": [email],
+    "subject": f"Invoice {invoice_no}",
+    "html": f"""
+    <h2>FlowPilot Invoice</h2>
+    <p><b>Invoice:</b> {invoice['invoice_no']}</p>
+    <p><b>Customer:</b> {invoice['customer_name']}</p>
+    <p><b>Product:</b> {invoice['product_name']}</p>
+    <p><b>Quantity:</b> {invoice['quantity']}</p>
+    <p><b>Total:</b> ₹{invoice['total']}</p>
+    """,
+    "attachments": [
+        {
+            "filename": f"{invoice_no}.pdf",
+            "path": pdf_path
+        }
+    ]
+})
+
+    
+        
+        
+        
+        
+    
 
     return {"message": "Invoice sent successfully"}
 
