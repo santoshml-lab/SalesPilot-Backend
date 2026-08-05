@@ -921,6 +921,7 @@ def send_invoice(invoice_no: str):
     # Generate PDF
     pdf_path = generate_invoice_pdf(invoice)
 
+    # Find customer
     customer = (
         supabase.table("customers")
         .select("*")
@@ -931,14 +932,13 @@ def send_invoice(invoice_no: str):
     if not customer.data:
         raise HTTPException(status_code=404, detail="Customer Not Found")
 
-    email = "santoshkrsbg36@gmail.com"
+    email = customer.data[0]["email"]
 
-      with open(pdf_path, "rb") as f:
-      pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
+    # Read PDF and convert to Base64
+    import base64
 
-    
-    
-    
+    with open(pdf_path, "rb") as f:
+        pdf_data = base64.b64encode(f.read()).decode("utf-8")
 
     resend.Emails.send({
         "from": "FlowPilot <onboarding@resend.dev>",
@@ -948,13 +948,9 @@ def send_invoice(invoice_no: str):
         <h2>FlowPilot Invoice</h2>
 
         <p><b>Invoice:</b> {invoice['invoice_no']}</p>
-
         <p><b>Customer:</b> {invoice['customer_name']}</p>
-
         <p><b>Product:</b> {invoice['product_name']}</p>
-
         <p><b>Quantity:</b> {invoice['quantity']}</p>
-
         <p><b>Total:</b> ₹{invoice['total']}</p>
         """,
         "attachments": [
@@ -965,7 +961,19 @@ def send_invoice(invoice_no: str):
         ]
     })
 
-    return {"message": "Invoice sent successfully"}
+    return {
+        "message": "Invoice sent successfully"
+    }
+
+
+
+
+    
+        
+
+      
+
+        
 
 
     
