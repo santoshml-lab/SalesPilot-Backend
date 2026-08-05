@@ -932,7 +932,7 @@ def send_invoice(invoice_no: str):
     if not customer.data:
         raise HTTPException(status_code=404, detail="Customer Not Found")
 
-    email = customer.data[0]["email"]
+    email = "santoshkrsbg36@gmail.com"
 
     # Read PDF and convert to Base64
     import base64
