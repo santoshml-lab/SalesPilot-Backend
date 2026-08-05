@@ -818,6 +818,33 @@ Status : {invoice['status']}
 
     return pdf_path
 
+@app.get("/sales-chart")
+def sales_chart():
+
+    response = (
+        supabase.table("sales")
+        .select("created_at,total")
+        .execute()
+    )
+
+    sales = response.data or []
+
+    chart = {}
+
+    for sale in sales:
+        day = sale["created_at"][:10]   # YYYY-MM-DD
+        chart[day] = chart.get(day, 0) + float(sale["total"])
+
+    result = []
+
+    for day, revenue in sorted(chart.items()):
+        result.append({
+            "date": day,
+            "revenue": revenue
+        })
+
+    return result
+
 @app.get("/invoice/{invoice_no}")
 def download_invoice(invoice_no: str):
 
