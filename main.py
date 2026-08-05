@@ -931,19 +931,35 @@ def send_invoice(invoice_no: str):
         raise HTTPException(status_code=404, detail="Customer Not Found")
 
     email = "santoshkrsbg36@gmail.com"
+    with open(pdf_path, "rb") as f:
+    pdf_data = f.read()
 
-    resend.Emails.send({
-        "from": "FlowPilot <onboarding@resend.dev>",
-        "to": [email],
-        "subject": f"Invoice {invoice_no}",
-        "html": f"""
-        <h2>FlowPilot Invoice</h2>
-        <p><b>Invoice:</b> {invoice['invoice_no']}</p>
-        <p><b>Customer:</b> {invoice['customer_name']}</p>
-        <p><b>Product:</b> {invoice['product_name']}</p>
-        <p><b>Quantity:</b> {invoice['quantity']}</p>
-        <p><b>Total:</b> ₹{invoice['total']}</p>
-        """,
+resend.Emails.send({
+    "from": "FlowPilot <onboarding@resend.dev>",
+    "to": [email],
+    "subject": f"Invoice {invoice_no}",
+    "html": f"""
+    <h2>FlowPilot Invoice</h2>
+    <p><b>Invoice:</b> {invoice['invoice_no']}</p>
+    <p><b>Customer:</b> {invoice['customer_name']}</p>
+    <p><b>Product:</b> {invoice['product_name']}</p>
+    <p><b>Quantity:</b> {invoice['quantity']}</p>
+    <p><b>Total:</b> ₹{invoice['total']}</p>
+    """,
+    "attachments": [
+        {
+            "filename": f"{invoice_no}.pdf",
+            "content": pdf_data
+        }
+    ]
+})
+
+    
+        
+        
+        
+        
+        
         "attachments": [
             {
                 "filename": f"{invoice_no}.pdf",
