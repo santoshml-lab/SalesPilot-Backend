@@ -184,6 +184,53 @@ Answer professionally in short.
 
     return {
         "answer": response.choices[0].message.content
+        
+    }
+
+@app.get("/business-analytics")
+def business_analytics():
+
+    revenue = get_today_revenue()
+    customers = get_total_customers()
+    products, stock, low_stock = get_inventory_summary()
+
+    sales = supabase.table("sales").select("*").execute().data or []
+
+    prompt = f"""
+You are FlowPilot AI Business Analyst.
+
+Business Statistics:
+
+Revenue: ₹{revenue}
+Customers: {customers}
+Products: {products}
+Stock Units: {stock}
+Low Stock: {low_stock}
+Orders: {len(sales)}
+
+Generate:
+
+1. Business Health
+2. Revenue Analysis
+3. Customer Growth
+4. Stock Analysis
+5. Top Recommendation
+
+Keep each point short.
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return {
+        "analysis": response.choices[0].message.content
     }
 
 
