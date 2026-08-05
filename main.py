@@ -186,6 +186,14 @@ Answer professionally in short.
         "answer": response.choices[0].message.content
     }
 
+
+
+
+    
+    
+
+
+
 @app.get("/sales-forecast")
 def sales_forecast():
 
