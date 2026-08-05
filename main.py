@@ -933,8 +933,8 @@ def send_invoice(invoice_no: str):
 
     email = "santoshkrsbg36@gmail.com"
 
-    with open(pdf_path, "rb") as f:
-    pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
+      with open(pdf_path, "rb") as f:
+      pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
 
     
     
