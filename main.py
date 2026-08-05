@@ -145,6 +145,48 @@ def get_invoices():
 
     return response.data
 
+@app.get("/sales-forecast")
+def sales_forecast():
+
+    sales = supabase.table("sales").select("*").execute().data or []
+
+    if not sales:
+        return {
+            "forecast": "No sales data available."
+        }
+
+    revenue = sum(float(s["total"]) for s in sales)
+
+    avg_sale = revenue / len(sales)
+
+    prompt = f"""
+You are an AI Business Analyst.
+
+Total Revenue: ₹{revenue}
+Total Orders: {len(sales)}
+Average Order Value: ₹{avg_sale:.2f}
+
+Predict next month's sales.
+Give:
+1. Forecast Revenue
+2. Growth %
+3. Reason
+4. Business Advice
+
+Keep response short.
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return {
+        "forecast": response.choices[0].message.content
+    }
+
 
 def get_low_stock_products():
     response = supabase.table("products").select("*").execute()
