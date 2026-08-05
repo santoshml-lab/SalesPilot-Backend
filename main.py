@@ -133,6 +133,18 @@ def health():
         "status": "healthy"
     }
 
+@app.get("/invoices")
+def get_invoices():
+
+    response = (
+        supabase.table("invoices")
+        .select("*")
+        .order("id", desc=True)
+        .execute()
+    )
+
+    return response.data
+
 
 def get_low_stock_products():
     response = supabase.table("products").select("*").execute()
