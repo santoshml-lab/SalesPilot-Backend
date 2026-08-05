@@ -12,6 +12,7 @@ import os
 import requests
 from reportlab.lib.utils import ImageReader
 import qrcode
+import base64
 
 load_dotenv()
 resend.api_key = os.getenv("RESEND_API_KEY")
