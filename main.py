@@ -845,6 +845,37 @@ def sales_chart():
 
     return result
 
+@app.get("/sales-summary")
+def sales_summary():
+
+    response = (
+        supabase.table("sales")
+        .select("*")
+        .execute()
+    )
+
+    sales = response.data or []
+
+    if not sales:
+        return {
+            "total_revenue": 0,
+            "total_orders": 0,
+            "average_order": 0,
+            "highest_sale": 0
+        }
+
+    total_revenue = sum(float(s["total"]) for s in sales)
+    total_orders = len(sales)
+    average_order = round(total_revenue / total_orders, 2)
+    highest_sale = max(float(s["total"]) for s in sales)
+
+    return {
+        "total_revenue": total_revenue,
+        "total_orders": total_orders,
+        "average_order": average_order,
+        "highest_sale": highest_sale
+    }
+
 @app.get("/invoice/{invoice_no}")
 def download_invoice(invoice_no: str):
 
