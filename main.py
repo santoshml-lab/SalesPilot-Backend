@@ -1015,6 +1015,66 @@ def dashboard():
         "best_customer": best_customer
     }
 
+class SaleRequest(BaseModel):
+    customer_id: int
+    product_id: int
+    quantity: int
+
+@app.post("/create-sale")
+def create_sale_api(data: SaleRequest):
+
+    customer = supabase.table("customers").select("*").eq("id", data.customer_id).execute().data[0]
+
+    product = supabase.table("products").select("*").eq("id", data.product_id).execute().data[0]
+
+    if int(product["stock"]) < data.quantity:
+        raise HTTPException(400, "Not enough stock")
+
+    total = float(product["price"]) * data.quantity
+
+    sale = supabase.table("sales").insert({
+        "customer_id": data.customer_id,
+        "product_id": data.product_id,
+        "quantity": data.quantity,
+        "total": total
+    }).execute()
+
+    invoice_no = f"INV-{sale.data[0]['id']}"
+
+    supabase.table("invoices").insert({
+        "invoice_no": invoice_no,
+        "sale_id": sale.data[0]["id"],
+        "customer_name": customer["name"],
+        "product_name": product["name"],
+        "quantity": data.quantity,
+        "total": total,
+        "status": "Paid"
+    }).execute()
+
+    new_stock = int(product["stock"]) - data.quantity
+
+    supabase.table("products").update({
+        "stock": new_stock
+    }).eq("id", product["id"]).execute()
+
+    create_notification(
+        "Sale Completed",
+        f"{data.quantity} x {product['name']} sold to {customer['name']}",
+        "success"
+    )
+
+    if new_stock <= int(product["low_stock_limit"]):
+        create_notification(
+            "Low Stock Alert",
+            f"{product['name']} stock is only {new_stock}",
+            "warning"
+        )
+
+    return {
+        "message": "Sale Created",
+        "invoice": invoice_no
+    }
+
 @app.post("/send-invoice/{invoice_no}")
 def send_invoice(invoice_no: str):
 
