@@ -818,6 +818,34 @@ Status : {invoice['status']}
 
     return pdf_path
 
+@app.get("/kpi")
+def kpi():
+
+    revenue = get_today_revenue()
+
+    customers = get_total_customers()
+
+    products, stock, low_stock = get_inventory_summary()
+
+    score = 100
+
+    if low_stock > 5:
+        score -= 15
+
+    if revenue < 1000:
+        score -= 20
+
+    if customers < 10:
+        score -= 10
+
+    return {
+        "business_score": score,
+        "revenue": revenue,
+        "customers": customers,
+        "products": products,
+        "low_stock": low_stock
+    }
+
 @app.get("/sales-forecast")
 def sales_forecast():
 
