@@ -933,9 +933,12 @@ def send_invoice(invoice_no: str):
 
     email = "santoshkrsbg36@gmail.com"
 
-    # Read PDF
     with open(pdf_path, "rb") as f:
-        pdf_data = f.read()
+    pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+    
+    
+    
 
     resend.Emails.send({
         "from": "FlowPilot <onboarding@resend.dev>",
