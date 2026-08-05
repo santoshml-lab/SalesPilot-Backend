@@ -4,9 +4,9 @@ groq
 python-dotenv
 supabase
 reportlab
-resend
 requests
 qrcode[pil]
 python-multipart
 pydantic
+resend==2.4.0
 
